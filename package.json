@@ -1,0 +1,17 @@
+{
+  "name": "push-messaging",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@pushprotocol/restapi": "^1.4.38",
+    "@pushprotocol/socket": "^0.5.3",
+    "ethers": "^5.7.2"
+  }
+}
