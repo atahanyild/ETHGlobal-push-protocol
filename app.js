@@ -12,8 +12,17 @@ const initialize = async (signer) => {
   return user;
 };
 
+const onFirstConnect = async () => {
+  /*
+        initialize user
+        loop through nfts
+        chatler içinde o nft için olan varsa dahil et bitir
+        yoksa o koleksiyon için grup oluştur
+    */
+};
+
 const sendMessage = async (user, reciever, content) => {
-  const stream = await userAlice.initStream([CONSTANTS.STREAM.CHAT]);
+  const stream = await user.initStream([CONSTANTS.STREAM.CHAT]);
   // Configure stream listen events and what to do
 
   stream.on(CONSTANTS.STREAM.CHAT, (message) => {
@@ -21,7 +30,7 @@ const sendMessage = async (user, reciever, content) => {
   });
   // Connect Stream
   stream.connect();
-  const aliceMessagesBob = await userAlice.chat.send(bobWalletAddress, content);
+  const aliceMessagesBob = await user.chat.send(reciever, content);
   console.log("123", aliceMessagesBob);
 };
 
@@ -31,11 +40,36 @@ const fetchAllChats = async (user) => {
   return chats;
 };
 
+const attendToGroup = async (user, groupChatId) => {
+  const joinGroup = await user.chat.group.join(groupChatId);
+};
+
+const createNormalGroup = async (
+  user,
+  groupName,
+  groupDescription,
+  groupImage,
+  members,
+  admins
+) => {
+  const newGroup = await user.chat.group.create(groupName, {
+    description: groupDescription,
+    image: groupImage,
+    members: members,
+    admins: admins,
+    private: false,
+  });
+
+  return newGroup;
+};
+
 const createGroupToCollection = async (
   user,
   groupName,
   admins,
   members,
+  //   chain_standart,
+  //   chain_id,
   contract,
   description,
   image
@@ -44,8 +78,8 @@ const createGroupToCollection = async (
   const createTokenGatedGroup = await user.chat.group.create(groupName, {
     description: description ? description : null,
     image: image ? image : null,
-    members: members,
-    admins: admins,
+    members: [],
+    admins: [],
     private: true,
     rules: {
       entry: {
@@ -74,9 +108,11 @@ const createGroupToCollection = async (
                   // criteria 1
                   type: "PUSH", // define type that rules engine should go for
                   category: "ERC721", // define it's ERC20 token that you want to check, supports ERC721 as well
-                  //   subcategory: "holder", // define if you are checking 'holder'
+                  subcategory: "holder", // define if you are checking 'holder'
                   data: {
-                    contract: contract,
+                    contract:
+                      //  `${chain_standart}:${chain_id}:${contract}`,
+                      "eip155:1:0x431dcee2e2c267f32dc4349619000b6cef1ba932",
                     comparison: ">=", // what comparison needs to pass
                     amount: 1, // amount that needs to passed
                     decimals: 18,
@@ -90,6 +126,8 @@ const createGroupToCollection = async (
       // since we are not defining chat permissions, it means that any user who is part of the group can chat
     },
   });
+
+  return createTokenGatedGroup;
 };
 
 const admin = ethers.Wallet.createRandom();
@@ -100,9 +138,7 @@ const userAlice = await initialize(alice);
 const userBob = await initialize(bob);
 // This will be the wallet address of the recipient
 
-const bobWalletAddress = "0x99A08ac6254dcf7ccc37CeC662aeba8eFA666666";
-
-// const messageBob = sendMessage(userAlice, bob.publicKey, {
+// const messageBob = await sendMessage(userAlice, bob.publicKey, {
 //   content: "Gm gm! It's a me... Mario",
 // });
 
@@ -118,67 +154,26 @@ const bobWalletAddress = "0x99A08ac6254dcf7ccc37CeC662aeba8eFA666666";
 //   [],
 //   //   [alice.publicKey, bob.publicKey],
 //   [],
-//   "eip155:80001:0x431dcee2e2c267f32dc4349619000b6cef1ba932"
+//   //   "eip155",
+//   //   "1",
+//   //   "0x431dcee2e2c267f32dc4349619000b6cef1ba932",
+//   "eip155:1:0x431dcee2e2c267f32dc4349619000b6cef1ba932"
 // );
+// console.log(group);
 
-// Creating a random signer from a wallet, ideally this is the wallet you will connect
-const signer = ethers.Wallet.createRandom();
+// const chatsOfAdmin = await fetchAllChats(userAdmin);
+// console.log(chatsOfAdmin);
 
-// Initialize wallet user
-// 'CONSTANTS.ENV.PROD' -> mainnet apps | 'CONSTANTS.ENV.STAGING' -> testnet apps
-
-// Creating your token gated community
-const createTokenGatedGroup = await userAlice.chat.group.create(
-  "Push Community",
-  {
-    description: null, // provide short description of group
-    image: null, // provide base64 encoded image
-    members: [], // not needed, rules define this, can omit
-    admins: [], // not needed as per problem statement, can omit
-    private: true,
-    rules: {
-      entry: {
-        // entry is based on conditions
-        conditions: {
-          any: [
-            // any of the decider should allow entry
-            {
-              // decider 1 - If admin or owner invites someone
-              any: [
-                {
-                  // criteria 1
-                  type: "PUSH",
-                  category: "INVITE",
-                  subcategory: "DEFAULT",
-                  data: {
-                    inviterRoles: ["ADMIN", "OWNER"],
-                  },
-                },
-              ],
-            },
-            {
-              // decicder 2 - If wallet holds 1 NFT on polygon testnet
-              any: [
-                {
-                  // criteria 1
-                  type: "PUSH", // define type that rules engine should go for
-                  category: "ERC721", // define it's ERC20 token that you want to check, supports ERC721 as well
-                  subcategory: "holder", // define if you are checking 'holder'
-                  data: {
-                    contract:
-                      "eip155:80001:0x9105D95577575116948F5afcF479254f49F27939",
-                    comparison: ">=", // what comparison needs to pass
-                    amount: 1, // amount that needs to passed
-                    decimals: 18,
-                  },
-                },
-              ],
-            },
-          ],
-        },
-      },
-    },
-  }
+const normalGroup = await createNormalGroup(
+  userAdmin,
+  "Grup 1",
+  "Hey Hey",
+  null,
+  [],
+  []
 );
+console.log("GRUPPP: ", normalGroup);
 
-console.log("Chat created successfully!", createTokenGatedGroup);
+await attendToGroup(userAlice, normalGroup.chatId);
+
+console.log("after:", normalGroup.members);
