@@ -1,6 +1,7 @@
 // Import Push SDK & Ethers
 import { PushAPI, CONSTANTS } from "@pushprotocol/restapi";
 import { ethers } from "ethers";
+import { EVENTS, createSocketConnection } from "@pushprotocol/socket";
 
 const initialize = async (signer) => {
   // Initialize wallet user
@@ -68,8 +69,8 @@ const createGroupToCollection = async (
   groupName,
   admins,
   members,
-  //   chain_standart,
-  //   chain_id,
+  chain_standart,
+  chain_id,
   contract,
   description,
   image
@@ -112,7 +113,7 @@ const createGroupToCollection = async (
                   data: {
                     contract:
                       //  `${chain_standart}:${chain_id}:${contract}`,
-                      "eip155:1:0x431dcee2e2c267f32dc4349619000b6cef1ba932",
+                      `${chain_standart}:${chain_id}:${contract}`,
                     comparison: ">=", // what comparison needs to pass
                     amount: 1, // amount that needs to passed
                     decimals: 18,
@@ -130,9 +131,25 @@ const createGroupToCollection = async (
   return createTokenGatedGroup;
 };
 
-const admin = ethers.Wallet.createRandom();
-const alice = ethers.Wallet.createRandom();
-const bob = ethers.Wallet.createRandom();
+// const admin = ethers.Wallet.createRandom();
+// console.log("admin pkey", admin.privateKey);
+// const alice = ethers.Wallet.createRandom();
+// console.log("alice pkey", alice.privateKey);
+
+// const bob = ethers.Wallet.createRandom();
+// console.log("bob pkey", bob.privateKey);
+
+const admin = new ethers.Wallet(
+  "0x0347f649a550b01f74b24d708ee56d5800887b15bf81206f3149ffb0da79145b"
+);
+const alice = new ethers.Wallet(
+  "0xafdf74eb8c1cc91ea96f2ad21a988927b09bd9bef2afef4a514955c6004ad342"
+);
+
+const bob = new ethers.Wallet(
+  "0x1aa87ce322b0b278b2046a804280ab271d00b34272cf7b316d512df682f02dd6"
+);
+
 const userAdmin = await initialize(admin);
 const userAlice = await initialize(alice);
 const userBob = await initialize(bob);
@@ -140,6 +157,10 @@ const userBob = await initialize(bob);
 
 // const messageBob = await sendMessage(userAlice, bob.publicKey, {
 //   content: "Gm gm! It's a me... Mario",
+// });
+
+// const messageBob2 = await sendMessage(userAlice, bob.publicKey, {
+//   content: "another message of me",
 // });
 
 // const aliceChats = await fetchAllChats(userAlice);
@@ -164,16 +185,15 @@ const userBob = await initialize(bob);
 // const chatsOfAdmin = await fetchAllChats(userAdmin);
 // console.log(chatsOfAdmin);
 
-const normalGroup = await createNormalGroup(
-  userAdmin,
-  "Grup 1",
-  "Hey Hey",
-  null,
-  [],
-  []
-);
-console.log("GRUPPP: ", normalGroup);
+// const normalGroup = await createNormalGroup(
+//   userAdmin,
+//   "Grup 1",
+//   "Hey Hey",
+//   null,
+//   [],
+//   []
+// );
+// console.log("GRUPPP: ", normalGroup);
+// await attendToGroup(userAlice);
 
-await attendToGroup(userAlice, normalGroup.chatId);
-
-console.log("after:", normalGroup.members);
+// console.log("after:", normalGroup.members);
