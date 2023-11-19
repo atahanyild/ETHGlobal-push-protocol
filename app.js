@@ -32,7 +32,6 @@ const sendMessage = async (user, reciever, content) => {
   // Connect Stream
   stream.connect();
   const aliceMessagesBob = await user.chat.send(reciever, content);
-  console.log("123", aliceMessagesBob);
 };
 
 const fetchAllChats = async (user) => {
@@ -156,12 +155,43 @@ const userBob = await initialize(bob);
 // This will be the wallet address of the recipient
 
 // const messageBob = await sendMessage(userAlice, bob.publicKey, {
-//   content: "Gm gm! It's a me... Mario",
+//   content: "1Gm gm! It's a me... Mario",
+// });
+// const messageBob3 = await sendMessage(userBob, alice.publicKey, {
+//   content: "3another message of me",
 // });
 
 // const messageBob2 = await sendMessage(userAlice, bob.publicKey, {
-//   content: "another message of me",
+//   content: "2another message of me",
 // });
+
+const chats = await fetchAllChats(userAlice);
+const chatRequest = await userAlice.chat.list("REQUESTS");
+
+// console.log(chats);
+// console.log("------");
+
+const messageBob2 = await sendMessage(
+  userAlice,
+  "0b3522d4260e81138e0d336bb1c1cf5ca062219217fd570db37c5b937f83d0ef",
+  {
+    content: "ahmet enessss",
+  }
+);
+
+const aliceChatHistory = await userAlice.chat.history(
+  "0b3522d4260e81138e0d336bb1c1cf5ca062219217fd570db37c5b937f83d0ef"
+);
+
+console.log(aliceChatHistory);
+
+// const messageBob3 = await sendMessage(
+//   userAlice,
+//   "chatid:a68d7b9edebfc0019fa24b8dc6131ef734f912aa575e00399e0132f895d01228",
+//   {
+//     content: "3another message of me",
+//   }
+// );
 
 // const aliceChats = await fetchAllChats(userAlice);
 // const bobChats = await fetchAllChats(userBob);
@@ -187,13 +217,24 @@ const userBob = await initialize(bob);
 
 // const normalGroup = await createNormalGroup(
 //   userAdmin,
-//   "Grup 1",
-//   "Hey Hey",
+//   "Grup 2",
+//   "Hey Hey HEYYO",
 //   null,
 //   [],
 //   []
 // );
 // console.log("GRUPPP: ", normalGroup);
-// await attendToGroup(userAlice);
+// await attendToGroup(
+//   userAlice,
+//   "0b3522d4260e81138e0d336bb1c1cf5ca062219217fd570db37c5b937f83d0ef"
+// );
 
 // console.log("after:", normalGroup.members);
+// const chats = await fetchAllChats(userAdmin);
+// console.log(
+//   chats[0].groupInformation.members,
+//   chats[1].groupInformation.members
+// );
+
+// const aliceChatHistory = await userAlice.chat.history();
+// console.log(aliceChatHistory);
